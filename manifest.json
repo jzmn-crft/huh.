@@ -1,0 +1,16 @@
+{
+  "name": "daily-fact",
+  "short_name": "daily-fact",
+  "description": "One genuinely surprising, sourced fact a day.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0B0C",
+  "theme_color": "#0B0B0C",
+  "icons": [
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

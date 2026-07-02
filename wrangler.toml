@@ -1,0 +1,9 @@
+name = "daily-fact"
+pages_build_output_dir = "."
+compatibility_date = "2025-01-01"
+
+# No KV binding here on purpose: this repo is public, and Pages KV bindings
+# are configured per-environment in the Cloudflare dashboard (Settings ->
+# Functions -> KV namespace bindings), not committed to wrangler.toml.
+# Without a binding, functions/api/_facts.js falls back to facts.sample.json
+# for local dev.
