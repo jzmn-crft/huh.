@@ -26,7 +26,7 @@ Each cut is reversible. None of them blocked shipping.
 
 ## Stack
 
-Vanilla JS, static site, Cloudflare Pages + KV. Total hosting cost: $0 (Cloudflare's free tier). Facts live in KV, not in this repo — added by hand, never via commit.
+Vanilla JS, web app (PWA), Cloudflare Pages + KV. Total hosting cost: $0 (Cloudflare's free tier). Facts live in KV, not in this repo — added by hand, never via commit.
 
 ```sh
 npx wrangler pages dev .
