@@ -1,59 +1,45 @@
-# huh
+# huh.
 
-A single-page site that shows one genuinely surprising, sourced fact at a time. No accounts, no categories, no notifications — the entire product is the curation.
+one fact per visit. free. that's the product.
 
-- Landing on the page shows **today's fact** — the same fact for every visitor on a given calendar date, chosen deterministically (`day-of-year % fact count`).
-- Click anywhere, or press space/enter, for **another** — a random fact, replacing the current one in place.
+**[live demo →](https://your-url-here.pages.dev)**
 
-## Stack
+## the problem
 
-Vanilla HTML/CSS/JS, no framework, no build step. Deploys to Cloudflare Pages with two Pages Functions (`functions/api/today.js`, `functions/api/random.js`) backed by Cloudflare KV.
+i was paying a subscription for an iOS widget that showed me one interesting fact a day. the content was good; the price for what is functionally a flashcard was not. knowledge this small shouldn't sit behind a paywall.
 
-## Fact data — deliberately not in this repo
+## the bet
 
-This repo is public, but the real facts are not. They live in a Cloudflare KV namespace, added and edited by hand — never via a git commit. Each record:
+people don't want a knowledge *platform*. they want a tiny, delightful moment of learning with zero friction. so v1 is exactly one interaction: land on the page, read a fact, click for another. no accounts, no streaks, no push notifications begging you to come back.
 
-```json
-{ "fact": "One sentence, verifiable, sourced.", "source_url": "https://..." }
-```
+## what i cut (on purpose)
 
-stored under key `fact:0001`, `fact:0002`, etc., plus one `meta:count` key holding the total number of facts, so "today's fact" can be computed without listing every key.
+- **accounts and progress tracking** — the value is the fact, not the metadata about your facts
+- **categories and search** — curation beats navigation at this scale
+- **daily email** — if the product is good, people return; if it isn't, an email won't save it
 
-To add or edit a fact against a deployed KV namespace:
+each cut is reversible. none of them blocked shipping.
 
-```sh
-wrangler kv key put --namespace-id=<ID> "fact:0007" '{"fact":"...","source_url":"https://..."}'
-wrangler kv key put --namespace-id=<ID> "meta:count" "22"
-```
+## stack
 
-(or use the Cloudflare dashboard's KV UI). There is no admin panel by design.
-
-## Local development
-
-There's no live KV binding available locally, so the Functions fall back to the bundled `facts.sample.json` — five clearly-marked placeholder entries, safe to commit, good for nothing but checking that the site runs.
+vanilla JS, static site, cloudflare pages + KV. no framework, no build step. total hosting cost: $0 (Cloudflare's free tier). facts live in KV, not in this repo — added by hand, never via commit.
 
 ```sh
 npx wrangler pages dev .
 ```
 
-Then visit the local URL it prints. `/api/today` and `/api/random` will serve from `facts.sample.json` automatically whenever `env.FACTS_KV` isn't bound.
+runs it locally against a bundled sample fact set, no KV binding required.
 
-## Deploying
+## what's next (maybe)
 
-1. Push this repo to GitHub.
-2. Connect the repo in Cloudflare Pages (framework preset: none / static).
-3. Create a KV namespace and bind it to the Pages project as `FACTS_KV` (Pages project → Settings → Functions → KV namespace bindings).
-4. Populate it with real facts via `wrangler kv key put` as above.
+- a "source" link on every fact — trust matters even for trivia
+- shareable fact cards
+- nothing else unless usage says so
 
-No other configuration needed.
+## honest notes
 
-## Add to home screen (iOS)
+AI-assisted build, human-directed decisions. i use AI coding tools the way i'd delegate to a fast junior engineer: i decide what to build and why, review everything, and own the outcome. the product judgment — what to cut, when to ship — is the part that doesn't delegate.
 
-`manifest.json` + `apple-touch-icon` + meta tags are included so the site can be added to an iOS home screen as a chrome-free, app-like launch straight into today's fact. `/api/today` returns clean, minimal JSON (`{ date, fact, source_url }`) so a future glanceable widget (e.g. via the Scriptable app) is a small follow-up, not a rework. A native iOS app / WidgetKit extension is out of scope for this project.
+---
 
-## Files
-
-- `index.html`, `styles.css`, `app.js` — the whole frontend
-- `functions/api/today.js`, `functions/api/random.js`, `functions/api/_facts.js` — Pages Functions, KV-backed with local sample fallback
-- `facts.sample.json` — placeholder data for local dev only, not real content
-- `manifest.json`, `icons/apple-touch-icon.png` — add-to-home-screen support
+by [jzmn-crft](https://github.com/jzmn-crft)
