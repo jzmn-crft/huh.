@@ -1,4 +1,4 @@
-const CACHE_NAME = "huh-v1";
+const CACHE_NAME = "huh-v2";
 const APP_SHELL = ["/", "/styles.css", "/app.js", "/manifest.json"];
 
 self.addEventListener("install", (event) => {

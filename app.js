@@ -78,7 +78,7 @@
 
   async function copyCurrent() {
     if (!current) return;
-    const text = current.source_url ? `Yo, did you know — ${current.fact}\n${current.source_url}` : `Yo, did you know — ${current.fact}`;
+    const text = current.source_url ? `Huh. Did you know — ${current.fact}\n${current.source_url}` : `Huh. Did you know — ${current.fact}`;
     try {
       await navigator.clipboard.writeText(text);
       showToast("copied");
@@ -278,6 +278,7 @@
     favoriteBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       toggleFavorite();
+      app.focus();
     });
   }
 
@@ -285,6 +286,7 @@
     shareBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       copyCurrent();
+      app.focus();
     });
   }
 
@@ -292,6 +294,7 @@
     savedBtn.addEventListener("click", (e) => {
       e.stopPropagation();
       openSaved();
+      app.focus();
     });
   }
 
@@ -299,12 +302,16 @@
     savedClose.addEventListener("click", (e) => {
       e.stopPropagation();
       closeSaved();
+      app.focus();
     });
   }
 
   if (savedPanel) {
     savedPanel.addEventListener("click", (e) => {
-      if (e.target === savedPanel) closeSaved();
+      if (e.target === savedPanel) {
+        closeSaved();
+        app.focus();
+      }
     });
   }
 
