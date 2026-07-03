@@ -4,17 +4,152 @@
   const factEl = document.getElementById("fact-text");
   const sourceEl = document.getElementById("fact-source");
   const hintEl = document.getElementById("hint");
+  const favoriteBtn = document.getElementById("favorite-btn");
+  const shareBtn = document.getElementById("share-btn");
+  const savedBtn = document.getElementById("saved-btn");
+  const savedPanel = document.getElementById("saved-panel");
+  const savedClose = document.getElementById("saved-close");
+  const savedList = document.getElementById("saved-list");
+  const savedEmpty = document.getElementById("saved-empty");
+  const toastEl = document.getElementById("toast");
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const SAVED_KEY = "huh_saved_facts";
 
   let loading = false;
+  let current = null;
+  let toastTimer = null;
 
   function formatDate(iso) {
     const d = new Date(iso + "T00:00:00");
     return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit" }).toUpperCase();
   }
 
+  function showToast(message) {
+    if (!toastEl) return;
+    toastEl.textContent = message;
+    toastEl.classList.add("toast-visible");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove("toast-visible"), 1800);
+  }
+
+  function getSaved() {
+    try {
+      return JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function setSaved(list) {
+    try {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(list));
+    } catch (err) {
+      // localStorage unavailable — favorites just won't persist
+    }
+  }
+
+  function isSaved(fact) {
+    return getSaved().some((f) => f.fact === fact);
+  }
+
+  function updateFavoriteButton() {
+    if (!favoriteBtn || !current) return;
+    const saved = isSaved(current.fact);
+    favoriteBtn.classList.toggle("active", saved);
+    favoriteBtn.setAttribute("aria-pressed", String(saved));
+    favoriteBtn.setAttribute("aria-label", saved ? "Remove from saved" : "Save this fact");
+  }
+
+  function toggleFavorite() {
+    if (!current) return;
+    const list = getSaved();
+    const idx = list.findIndex((f) => f.fact === current.fact);
+    if (idx >= 0) {
+      list.splice(idx, 1);
+      showToast("removed");
+    } else {
+      list.unshift({ fact: current.fact, source_url: current.source_url, date: current.date });
+      showToast("saved");
+    }
+    setSaved(list);
+    updateFavoriteButton();
+  }
+
+  async function copyCurrent() {
+    if (!current) return;
+    const text = current.source_url ? `${current.fact}\n${current.source_url}` : current.fact;
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("copied");
+    } catch (err) {
+      showToast("couldn't copy");
+    }
+  }
+
+  function renderSavedList() {
+    const list = getSaved();
+    savedList.innerHTML = "";
+    savedEmpty.style.display = list.length ? "none" : "block";
+    for (const item of list) {
+      const li = document.createElement("li");
+      li.className = "saved-item";
+
+      const p = document.createElement("p");
+      p.className = "saved-item-fact";
+      p.textContent = item.fact;
+      li.appendChild(p);
+
+      const row = document.createElement("div");
+      row.className = "saved-item-row";
+
+      if (item.source_url) {
+        const a = document.createElement("a");
+        a.className = "mono dim source-link";
+        a.href = item.source_url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        try {
+          a.textContent = new URL(item.source_url).hostname.replace(/^www\./, "");
+        } catch (err) {
+          a.textContent = item.source_url;
+        }
+        row.appendChild(a);
+      }
+
+      const removeBtn = document.createElement("button");
+      removeBtn.className = "action-btn saved-item-remove";
+      removeBtn.type = "button";
+      removeBtn.setAttribute("aria-label", "Remove from saved");
+      removeBtn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m2 0-.8 12.1a1 1 0 0 1-1 .9H7.8a1 1 0 0 1-1-.9L6 7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      removeBtn.addEventListener("click", () => {
+        const next = getSaved().filter((f) => f.fact !== item.fact);
+        setSaved(next);
+        renderSavedList();
+        updateFavoriteButton();
+      });
+      row.appendChild(removeBtn);
+
+      li.appendChild(row);
+      savedList.appendChild(li);
+    }
+  }
+
+  function openSaved() {
+    renderSavedList();
+    savedPanel.hidden = false;
+    requestAnimationFrame(() => savedPanel.classList.add("saved-panel-open"));
+  }
+
+  function closeSaved() {
+    savedPanel.classList.remove("saved-panel-open");
+    setTimeout(() => {
+      savedPanel.hidden = true;
+    }, 200);
+  }
+
   function render(data) {
+    current = data;
     dateEl.textContent = formatDate(data.date);
     factEl.textContent = data.fact;
     if (data.source_url) {
@@ -24,25 +159,54 @@
     } else {
       sourceEl.style.visibility = "hidden";
     }
+    updateFavoriteButton();
+  }
+
+  function setLoadingState() {
+    factEl.classList.add("skeleton");
+    factEl.textContent = "";
+  }
+
+  function setErrorState() {
+    factEl.classList.remove("skeleton");
+    factEl.textContent = "Couldn't load a fact — tap or press space to retry.";
+    sourceEl.style.visibility = "hidden";
+    current = null;
+  }
+
+  async function fetchFact(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("bad response");
+    return res.json();
   }
 
   async function load(url) {
     if (loading) return;
     loading = true;
-    try {
-      const res = await fetch(url);
-      const data = await res.json();
 
-      if (prefersReducedMotion || !factEl.textContent) {
+    const isFirstLoad = !factEl.dataset.loadedOnce;
+    if (isFirstLoad) setLoadingState();
+
+    try {
+      const applyRender = async () => {
+        const data = await fetchFact(url);
+        factEl.classList.remove("skeleton");
         render(data);
+        factEl.dataset.loadedOnce = "1";
+      };
+
+      if (prefersReducedMotion || isFirstLoad) {
+        await applyRender();
+      } else if (document.startViewTransition) {
+        await document.startViewTransition(applyRender).finished;
       } else {
         factEl.classList.add("transitioning");
         await new Promise((r) => setTimeout(r, 220));
-        render(data);
+        await applyRender();
         factEl.classList.remove("transitioning");
       }
     } catch (err) {
-      factEl.textContent = "Couldn't load a fact right now — try again in a moment.";
+      setErrorState();
     } finally {
       loading = false;
     }
@@ -62,8 +226,12 @@
     }
   }
 
+  function isInteractive(target) {
+    return target.closest(".action-row") || target.closest(".saved-panel");
+  }
+
   app.addEventListener("click", (e) => {
-    if (e.target === sourceEl) return;
+    if (isInteractive(e.target)) return;
     dismissHint();
     next();
   });
@@ -75,6 +243,70 @@
       next();
     }
   });
+
+  // Swipe support (mobile): swipe left/up to load another fact.
+  let touchStartX = 0;
+  let touchStartY = 0;
+  app.addEventListener(
+    "touchstart",
+    (e) => {
+      if (isInteractive(e.target)) return;
+      const t = e.changedTouches[0];
+      touchStartX = t.clientX;
+      touchStartY = t.clientY;
+    },
+    { passive: true }
+  );
+
+  app.addEventListener(
+    "touchend",
+    (e) => {
+      if (isInteractive(e.target)) return;
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX;
+      const dy = t.clientY - touchStartY;
+      const THRESHOLD = 40;
+      if (Math.abs(dx) > THRESHOLD || Math.abs(dy) > THRESHOLD) {
+        dismissHint();
+        next();
+      }
+    },
+    { passive: true }
+  );
+
+  if (favoriteBtn) {
+    favoriteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite();
+    });
+  }
+
+  if (shareBtn) {
+    shareBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      copyCurrent();
+    });
+  }
+
+  if (savedBtn) {
+    savedBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openSaved();
+    });
+  }
+
+  if (savedClose) {
+    savedClose.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeSaved();
+    });
+  }
+
+  if (savedPanel) {
+    savedPanel.addEventListener("click", (e) => {
+      if (e.target === savedPanel) closeSaved();
+    });
+  }
 
   if (hintEl) {
     let seenHint = false;

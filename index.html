@@ -6,6 +6,17 @@
   <title>huh.</title>
   <meta name="description" content="One genuinely surprising, sourced fact a day." />
 
+  <!-- Open Graph / Twitter card -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="huh." />
+  <meta property="og:title" content="huh." />
+  <meta property="og:description" content="One genuinely surprising, sourced fact a day." />
+  <meta property="og:image" content="/icons/apple-touch-icon.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="huh." />
+  <meta name="twitter:description" content="One genuinely surprising, sourced fact a day." />
+  <meta name="twitter:image" content="/icons/apple-touch-icon.png" />
+
   <!-- iOS add-to-home-screen -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -35,11 +46,45 @@
       <a id="fact-source" class="mono dim source-link" href="#" target="_blank" rel="noopener noreferrer"></a>
     </div>
 
+    <div class="action-row">
+      <button id="favorite-btn" class="action-btn" type="button" aria-pressed="false" aria-label="Save this fact">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 3.5l2.6 5.6 6.1.6-4.6 4.2 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.2 6.1-.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </button>
+      <button id="share-btn" class="action-btn" type="button" aria-label="Copy this fact">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 8a3 3 0 1 0-2.83-4H12a3 3 0 0 0 .1 3.9L8.9 9.8a3 3 0 1 0 0 4.4l3.2 1.9a3 3 0 1 0 .75-1.3L9.65 13a3 3 0 0 0 0-2l3.2-1.9c.46.55 1.13.9 1.9.9a3 3 0 0 0 .25 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      </button>
+      <button id="saved-btn" class="action-btn" type="button" aria-label="View saved facts">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 4h16v16l-8-4-8 4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
     <span class="disclaimer mono dim">huh. may make mistakes. Always verify with the source.</span>
 
     <span class="hint mono dim" id="hint">curious? spacebar / click</span>
   </main>
 
+  <div id="toast" class="toast mono" role="status" aria-live="polite"></div>
+
+  <div id="saved-panel" class="saved-panel" hidden>
+    <div class="saved-panel-inner">
+      <div class="saved-panel-header">
+        <span class="mono">saved</span>
+        <button id="saved-close" class="action-btn" type="button" aria-label="Close saved facts">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <ul id="saved-list" class="saved-list"></ul>
+      <p id="saved-empty" class="mono dim saved-empty">nothing saved yet</p>
+    </div>
+  </div>
+
   <script src="/app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/sw.js").catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
