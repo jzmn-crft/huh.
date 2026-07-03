@@ -78,7 +78,7 @@
 
   async function copyCurrent() {
     if (!current) return;
-    const text = current.source_url ? `${current.fact}\n${current.source_url}` : current.fact;
+    const text = current.source_url ? `Yo, did you know — ${current.fact}\n${current.source_url}` : `Yo, did you know — ${current.fact}`;
     try {
       await navigator.clipboard.writeText(text);
       showToast("copied");
