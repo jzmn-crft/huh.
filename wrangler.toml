@@ -2,8 +2,12 @@ name = "huh"
 pages_build_output_dir = "."
 compatibility_date = "2025-01-01"
 
-# No KV binding here on purpose: this repo is public, and Pages KV bindings
-# are configured per-environment in the Cloudflare dashboard (Settings ->
-# Functions -> KV namespace bindings), not committed to wrangler.toml.
+# KV binding must live here: once a Pages project has pages_build_output_dir
+# set, Cloudflare manages bindings via this file, not the dashboard.
+# The namespace id below is not a secret (no read/write access without
+# separate Cloudflare account credentials), so it's safe to commit.
 # Without a binding, functions/api/_facts.js falls back to facts.sample.json
 # for local dev.
+[[kv_namespaces]]
+binding = "FACTS_KV"
+id = "70c27bdc9e4f40f886fdde4545902e45"
