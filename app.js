@@ -358,7 +358,56 @@
     });
   }
 
-  // Hint logic — different messages for mobile vs desktop, shown once
+  // ---- iOS install banner ----
+  function isIOS() {
+    return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+  }
+
+  function isStandalone() {
+    return "standalone" in navigator && navigator.standalone;
+  }
+
+  function isVisitCountMet() {
+    try {
+      const visits = parseInt(localStorage.getItem("huh_visits") || "0", 10) + 1;
+      localStorage.setItem("huh_visits", String(visits));
+      return visits >= 2;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function isInstallBannerDismissed() {
+    try {
+      return localStorage.getItem("huh_install_dismissed") === "1";
+    } catch (err) {
+      return false;
+    }
+  }
+
+  const installBanner = document.getElementById("install-banner");
+  const installBannerClose = document.getElementById("install-banner-close");
+
+  if (installBanner && isIOS() && !isStandalone() && isVisitCountMet() && !isInstallBannerDismissed()) {
+    installBanner.hidden = false;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => installBanner.classList.add("install-banner-visible"));
+    });
+  }
+
+  if (installBannerClose) {
+    installBannerClose.addEventListener("click", () => {
+      installBanner.classList.remove("install-banner-visible");
+      setTimeout(() => {
+        installBanner.hidden = true;
+      }, 300);
+      try {
+        localStorage.setItem("huh_install_dismissed", "1");
+      } catch (err) {}
+    });
+  }
+
+  // ---- Hint — different messages for mobile vs desktop, shown once ----
   if (hintEl) {
     const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     let seenHint = false;
@@ -368,8 +417,10 @@
       // localStorage unavailable — treat as first visit every time
     }
     if (!seenHint) {
-      if (isTouchDevice) {
-        hintEl.textContent = "add to home screen for a faster experience";
+      if (!isTouchDevice) {
+        hintEl.textContent = "curious? spacebar / click";
+      } else {
+        hintEl.textContent = "swipe or tap for another";
       }
       hintEl.classList.add("hint-first");
       setTimeout(dismissHint, 6000);
