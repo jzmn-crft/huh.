@@ -1,8 +1,8 @@
 # huh.
 
-One fact per visit. Free. That's the product.
+One fact per day. Free. That's the product.
 
-**[live demo →](https://your-url-here.pages.dev)**
+**[live site →](https://huh.jazmeen.com/)**
 
 ## The Problem
 
@@ -11,6 +11,10 @@ I was paying a subscription for an iOS widget that showed me one interesting fac
 ## The Bet
 
 People don't want a knowledge *platform*. They want a tiny, delightful moment of learning with zero friction. So v1 is exactly one interaction: land on the page, read a fact, click for another. No accounts, no streaks, no push notifications begging you to come back.
+
+## What's Here
+
+A new fact every day, sourced and timestamped. Tap for a random one. Save the ones you like. Share them with a tap. That's the whole interaction.
 
 ## What I Cut (on purpose)
 
@@ -22,7 +26,7 @@ Each cut is reversible. None of them blocked shipping.
 
 ## Stack
 
-Vanilla JS, static site, cloudflare pages + KV. Total hosting cost: $0 (Cloudflare's free tier). Facts live in KV, not in this repo — added by hand, never via commit.
+Vanilla JS, static site, Cloudflare Pages + KV. Total hosting cost: $0 (Cloudflare's free tier). Facts live in KV, not in this repo — added by hand, never via commit.
 
 ```sh
 npx wrangler pages dev .
@@ -32,13 +36,21 @@ Runs it locally against a bundled sample fact set, no KV binding required.
 
 ## What's Next (maybe)
 
-- A "source" link on every fact — trust matters even for trivia
-- Shareable fact cards
+- A browser extension — a fact in every new tab
+- An archive of past facts of the day
 - Nothing else unless usage says so
 
 ## Honest Notes
 
-AI-assisted build, human-directed decisions. I use AI coding tools the way i'd delegate to a fast junior engineer: I decide what to build and why, review everything, and own the outcome. The product judgment — what to cut, when to ship — is the part that doesn't delegate.
+AI-assisted build, human-directed decisions. I use AI coding tools the way I'd delegate to a fast junior engineer: I decide what to build and why, review everything, and own the outcome. The product judgment — what to cut, when to ship — is the part that doesn't delegate.
+
+## Contributing
+
+Not accepting contributions — this is a personal project.
+
+## License
+
+MIT
 
 ---
 

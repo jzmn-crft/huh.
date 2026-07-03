@@ -12,6 +12,9 @@
   const savedList = document.getElementById("saved-list");
   const savedEmpty = document.getElementById("saved-empty");
   const toastEl = document.getElementById("toast");
+  const aboutBtn = document.getElementById("about-btn");
+  const aboutPanel = document.getElementById("about-panel");
+  const aboutClose = document.getElementById("about-close");
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const SAVED_KEY = "huh_saved_facts";
@@ -19,6 +22,7 @@
   let loading = false;
   let current = null;
   let toastTimer = null;
+  let isTodayFact = true;
 
   function formatDate(iso) {
     const d = new Date(iso + "T00:00:00");
@@ -152,6 +156,7 @@
     current = data;
     dateEl.textContent = formatDate(data.date);
     factEl.textContent = data.fact;
+    document.title = isTodayFact ? "huh. · fact of the day" : "huh. · random fact";
     if (data.source_url) {
       sourceEl.href = data.source_url;
       sourceEl.textContent = new URL(data.source_url).hostname.replace(/^www\./, "");
@@ -169,7 +174,7 @@
 
   function setErrorState() {
     factEl.classList.remove("skeleton");
-    factEl.textContent = "Couldn't load a fact — tap or press space to retry.";
+    factEl.textContent = "couldn't load a fact — tap or press space to retry.";
     sourceEl.style.visibility = "hidden";
     current = null;
   }
@@ -183,6 +188,7 @@
   async function load(url) {
     if (loading) return;
     loading = true;
+    isTodayFact = url === "/api/today";
 
     const isFirstLoad = !factEl.dataset.loadedOnce;
     if (isFirstLoad) setLoadingState();
@@ -227,7 +233,7 @@
   }
 
   function isInteractive(target) {
-    return target.closest(".action-row") || target.closest(".saved-panel");
+    return target.closest(".action-row") || target.closest(".saved-panel") || target.closest("#about-panel") || target.closest("#about-btn");
   }
 
   app.addEventListener("click", (e) => {
@@ -315,7 +321,46 @@
     });
   }
 
+  // About panel
+  function openAbout() {
+    aboutPanel.hidden = false;
+    requestAnimationFrame(() => aboutPanel.classList.add("saved-panel-open"));
+  }
+
+  function closeAbout() {
+    aboutPanel.classList.remove("saved-panel-open");
+    setTimeout(() => {
+      aboutPanel.hidden = true;
+    }, 200);
+  }
+
+  if (aboutBtn) {
+    aboutBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openAbout();
+    });
+  }
+
+  if (aboutClose) {
+    aboutClose.addEventListener("click", (e) => {
+      e.stopPropagation();
+      closeAbout();
+      app.focus();
+    });
+  }
+
+  if (aboutPanel) {
+    aboutPanel.addEventListener("click", (e) => {
+      if (e.target === aboutPanel) {
+        closeAbout();
+        app.focus();
+      }
+    });
+  }
+
+  // Hint logic — different messages for mobile vs desktop, shown once
   if (hintEl) {
+    const isTouchDevice = "ontouchstart" in window || navigator.maxTouchPoints > 0;
     let seenHint = false;
     try {
       seenHint = localStorage.getItem("df_seen_hint") === "1";
@@ -323,6 +368,9 @@
       // localStorage unavailable — treat as first visit every time
     }
     if (!seenHint) {
+      if (isTouchDevice) {
+        hintEl.textContent = "add to home screen for a faster experience";
+      }
       hintEl.classList.add("hint-first");
       setTimeout(dismissHint, 6000);
     }

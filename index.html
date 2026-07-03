@@ -34,7 +34,10 @@
 <body>
   <div class="bg-mesh" aria-hidden="true"><span></span></div>
   <div class="bg-grain" aria-hidden="true"></div>
-  <span class="brand mono" aria-hidden="true">huh.</span>
+  <button class="brand mono" id="about-btn" type="button" aria-label="About huh.">
+    huh.
+    <svg class="brand-icon" viewBox="0 0 16 16" width="11" height="11" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M7.2 6.8h1.6v4.8M7.2 4.4h1.6v1.2H7.2z" fill="currentColor"/></svg>
+  </button>
   <main id="app" tabindex="0" aria-live="polite" aria-label="Today's fact. Press space or enter, or click, for another.">
     <div class="meta-row">
       <span id="fact-date" class="mono dim"></span>
@@ -75,6 +78,23 @@
       </div>
       <ul id="saved-list" class="saved-list"></ul>
       <p id="saved-empty" class="mono dim saved-empty">nothing saved yet</p>
+    </div>
+  </div>
+
+  <div id="about-panel" class="saved-panel" hidden>
+    <div class="saved-panel-inner about-panel-inner">
+      <div class="saved-panel-header">
+        <span class="mono">about</span>
+        <button id="about-close" class="action-btn" type="button" aria-label="Close about">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="about-content">
+        <p class="about-tagline">One fact per day. Free. That's the product.</p>
+        <p class="about-body">This is today's fact. Tap anywhere for a random one. Save the ones you like. Share them with a tap. That's the whole interaction.</p>
+        <p class="about-body">No accounts, no streaks, no push notifications begging you to come back.</p>
+        <a class="about-link mono dim" href="https://github.com/jzmn-crft/huh." target="_blank" rel="noopener noreferrer">source on github →</a>
+      </div>
     </div>
   </div>
 
