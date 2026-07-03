@@ -3,6 +3,7 @@
   const dateEl = document.getElementById("fact-date");
   const factEl = document.getElementById("fact-text");
   const sourceEl = document.getElementById("fact-source");
+  const hintEl = document.getElementById("hint");
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -51,17 +52,42 @@
     load("/api/random");
   }
 
+  function dismissHint() {
+    if (!hintEl) return;
+    hintEl.classList.remove("hint-first");
+    try {
+      localStorage.setItem("df_seen_hint", "1");
+    } catch (err) {
+      // localStorage unavailable (private browsing, etc) — hint just won't persist
+    }
+  }
+
   app.addEventListener("click", (e) => {
     if (e.target === sourceEl) return;
+    dismissHint();
     next();
   });
 
   app.addEventListener("keydown", (e) => {
     if (e.code === "Space" || e.code === "Enter") {
       e.preventDefault();
+      dismissHint();
       next();
     }
   });
+
+  if (hintEl) {
+    let seenHint = false;
+    try {
+      seenHint = localStorage.getItem("df_seen_hint") === "1";
+    } catch (err) {
+      // localStorage unavailable — treat as first visit every time
+    }
+    if (!seenHint) {
+      hintEl.classList.add("hint-first");
+      setTimeout(dismissHint, 6000);
+    }
+  }
 
   load("/api/today");
 })();

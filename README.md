@@ -1,4 +1,4 @@
-# daily-fact
+# huh
 
 A single-page site that shows one genuinely surprising, sourced fact at a time. No accounts, no categories, no notifications — the entire product is the curation.
 

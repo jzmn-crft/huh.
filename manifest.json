@@ -1,6 +1,6 @@
 {
-  "name": "daily-fact",
-  "short_name": "daily-fact",
+  "name": "huh",
+  "short_name": "huh",
   "description": "One genuinely surprising, sourced fact a day.",
   "start_url": "/",
   "display": "standalone",
