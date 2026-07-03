@@ -2,7 +2,7 @@
 
 One fact per day. Free. That's the product.
 
-**[live site →](https://huh.jazmeen.com/)**
+**[live webapp →](https://huh.jazmeen.com/)**
 
 ## The Problem
 
