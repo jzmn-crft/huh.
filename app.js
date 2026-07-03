@@ -233,7 +233,7 @@
   }
 
   function isInteractive(target) {
-    return target.closest(".action-row") || target.closest(".saved-panel") || target.closest("#about-panel") || target.closest("#about-btn");
+    return target.closest(".action-row") || target.closest(".saved-panel") || target.closest("#about-panel") || target.closest("#about-btn") || target.closest("#install-banner");
   }
 
   app.addEventListener("click", (e) => {
@@ -390,6 +390,7 @@
 
   if (installBanner && isIOS() && !isStandalone() && isVisitCountMet() && !isInstallBannerDismissed()) {
     installBanner.hidden = false;
+    app.classList.add("has-install-banner");
     requestAnimationFrame(() => {
       requestAnimationFrame(() => installBanner.classList.add("install-banner-visible"));
     });
@@ -398,6 +399,7 @@
   if (installBannerClose) {
     installBannerClose.addEventListener("click", () => {
       installBanner.classList.remove("install-banner-visible");
+      app.classList.remove("has-install-banner");
       setTimeout(() => {
         installBanner.hidden = true;
       }, 300);
