@@ -44,6 +44,14 @@ Runs it locally against a bundled sample fact set, no KV binding required.
 
 AI-assisted build, human-directed decisions. I use AI coding tools the way I'd delegate to a fast junior engineer: I decide what to build and why, review everything, and own the outcome. The product judgment — what to cut, when to ship — is the part that doesn't delegate.
 
+## Privacy
+
+No accounts, no cookies, no analytics, no tracking of any kind. This app doesn't collect, store, or share any personal data. Facts you save are stored locally on your device and never sent anywhere.
+
+## Security
+
+If you discover a security vulnerability, please report it via [GitHub's private vulnerability reporting](https://github.com/jzmn-crft/huh./security/advisories/new) rather than opening a public issue.
+
 ## Contributing
 
 Not accepting contributions — this is a personal project.
