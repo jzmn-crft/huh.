@@ -74,6 +74,20 @@ body {
   animation: drift3 46s ease-in-out infinite;
 }
 
+/* Live blur() over large animated areas is one of the most GPU-expensive
+   things a mobile browser can do per frame. Coarse-pointer (touch) devices
+   typically have weaker GPUs than the laptops this was designed on, so cut
+   the blur radius there and drop the third layer entirely. */
+@media (pointer: coarse) {
+  .bg-mesh::before,
+  .bg-mesh::after {
+    filter: blur(50px);
+  }
+  .bg-mesh span {
+    display: none;
+  }
+}
+
 .bg-grain {
   position: fixed;
   inset: 0;
@@ -107,6 +121,15 @@ body {
   }
 }
 
+/* Pause the blurred background drift while a panel is open — the transition
+   competes with these large, GPU-heavy blur animations for compositor time,
+   which is what makes panels feel slow to appear on weaker mobile GPUs. */
+.bg-mesh.bg-mesh-paused::before,
+.bg-mesh.bg-mesh-paused::after,
+.bg-mesh.bg-mesh-paused span {
+  animation-play-state: paused;
+}
+
 .mono {
   font-family: "Space Mono", "SF Mono", "Menlo", "Consolas", monospace;
 }
@@ -128,6 +151,7 @@ body {
   cursor: pointer;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 #app:focus-visible {
@@ -152,6 +176,7 @@ body {
   border: none;
   padding: 0;
   cursor: pointer;
+  touch-action: manipulation;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -292,6 +317,7 @@ body {
   background: rgba(255, 255, 255, 0.03);
   color: var(--fg-dim);
   cursor: pointer;
+  touch-action: manipulation;
   transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
 }
 

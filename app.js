@@ -15,6 +15,17 @@
   const aboutBtn = document.getElementById("about-btn");
   const aboutPanel = document.getElementById("about-panel");
   const aboutClose = document.getElementById("about-close");
+  const bgMesh = document.querySelector(".bg-mesh");
+
+  let openPanelCount = 0;
+  function pauseBgMesh() {
+    openPanelCount++;
+    if (bgMesh) bgMesh.classList.add("bg-mesh-paused");
+  }
+  function resumeBgMesh() {
+    openPanelCount = Math.max(0, openPanelCount - 1);
+    if (bgMesh && openPanelCount === 0) bgMesh.classList.remove("bg-mesh-paused");
+  }
 
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const SAVED_KEY = "huh_saved_facts";
@@ -141,12 +152,14 @@
 
   function openSaved() {
     renderSavedList();
+    pauseBgMesh();
     savedPanel.hidden = false;
     requestAnimationFrame(() => savedPanel.classList.add("saved-panel-open"));
   }
 
   function closeSaved() {
     savedPanel.classList.remove("saved-panel-open");
+    resumeBgMesh();
     setTimeout(() => {
       savedPanel.hidden = true;
     }, 200);
@@ -333,12 +346,14 @@
 
   // About panel
   function openAbout() {
+    pauseBgMesh();
     aboutPanel.hidden = false;
     requestAnimationFrame(() => aboutPanel.classList.add("saved-panel-open"));
   }
 
   function closeAbout() {
     aboutPanel.classList.remove("saved-panel-open");
+    resumeBgMesh();
     setTimeout(() => {
       aboutPanel.hidden = true;
     }, 200);
