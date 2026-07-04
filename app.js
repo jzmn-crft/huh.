@@ -236,6 +236,16 @@
     return target.closest(".action-row") || target.closest(".saved-panel") || target.closest("#about-panel") || target.closest("#about-btn") || target.closest("#install-banner");
   }
 
+  // Stop touch events on interactive controls from ever reaching #app's
+  // touchstart/touchend swipe handlers. Without this, iOS Safari treats the
+  // tap as ambiguous between "tap the button" and "start a swipe on #app"
+  // and only resolves it (firing the button's click) once a later swipe
+  // settles the gesture — so buttons appear dead until you swipe.
+  document.querySelectorAll(".action-row, .saved-panel, #about-panel, #about-btn, #install-banner").forEach((el) => {
+    el.addEventListener("touchstart", (e) => e.stopPropagation(), { passive: true });
+    el.addEventListener("touchend", (e) => e.stopPropagation(), { passive: true });
+  });
+
   app.addEventListener("click", (e) => {
     if (isInteractive(e.target)) return;
     dismissHint();
