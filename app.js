@@ -1,4 +1,13 @@
 (() => {
+  const fontStylesheet = document.getElementById("font-stylesheet");
+  if (fontStylesheet) fontStylesheet.media = "all";
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    });
+  }
+
   const app = document.getElementById("app");
   const dateEl = document.getElementById("fact-date");
   const factEl = document.getElementById("fact-text");
@@ -34,6 +43,14 @@
   let current = null;
   let toastTimer = null;
   let isTodayFact = true;
+
+  function isSafeUrl(url) {
+    try {
+      return ["http:", "https:"].includes(new URL(url).protocol);
+    } catch (err) {
+      return false;
+    }
+  }
 
   function formatDate(iso) {
     const d = new Date(iso + "T00:00:00");
@@ -118,7 +135,7 @@
       const row = document.createElement("div");
       row.className = "saved-item-row";
 
-      if (item.source_url) {
+      if (item.source_url && isSafeUrl(item.source_url)) {
         const a = document.createElement("a");
         a.className = "mono dim source-link";
         a.href = item.source_url;
@@ -170,7 +187,7 @@
     dateEl.textContent = formatDate(data.date);
     factEl.textContent = data.fact;
     document.title = isTodayFact ? "huh. · fact of the day" : "huh. · random fact";
-    if (data.source_url) {
+    if (data.source_url && isSafeUrl(data.source_url)) {
       sourceEl.href = data.source_url;
       sourceEl.textContent = new URL(data.source_url).hostname.replace(/^www\./, "");
       sourceEl.style.visibility = "visible";

@@ -54,7 +54,7 @@ If you discover a security vulnerability, please report it via [GitHub's private
 
 ## Contributing
 
-Not accepting contributions — this is a personal project.
+Not accepting contributions — this is a personal project for now.
 
 ## License
 
