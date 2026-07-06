@@ -58,7 +58,7 @@ Not accepting contributions — this is a personal project for now.
 
 ## License
 
-MIT
+[MIT](LICENSE)
 
 ---
 
