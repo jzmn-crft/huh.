@@ -270,6 +270,19 @@ body {
   }
 }
 
+.why-weird {
+  max-width: 480px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 14px 0 0;
+  opacity: 0.6;
+}
+
+.why-weird:empty {
+  display: none;
+}
+
 .source-row {
   margin-top: 32px;
   min-height: 16px;

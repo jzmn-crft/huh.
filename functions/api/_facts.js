@@ -31,6 +31,5 @@ export async function getFactByIndex(env, index) {
     return value ?? { fact: "Fact not found.", source_url: "" };
   }
   const sample = await loadSample(env);
-  const entry = sample[index];
-  return { fact: entry.fact, source_url: entry.source_url };
+  return sample[index];
 }

@@ -13,6 +13,7 @@
   const factEl = document.getElementById("fact-text");
   const sourceEl = document.getElementById("fact-source");
   const hintEl = document.getElementById("hint");
+  const whyWeirdEl = document.getElementById("fact-why-weird");
   const favoriteBtn = document.getElementById("favorite-btn");
   const shareBtn = document.getElementById("share-btn");
   const savedBtn = document.getElementById("saved-btn");
@@ -101,7 +102,7 @@
       list.splice(idx, 1);
       showToast("removed");
     } else {
-      list.unshift({ fact: current.fact, source_url: current.source_url, date: current.date });
+      list.unshift({ fact: current.fact, source_url: current.source_url, date: current.date, domain: current.domain });
       showToast("saved");
     }
     setSaved(list);
@@ -186,6 +187,7 @@
     current = data;
     dateEl.textContent = formatDate(data.date);
     factEl.textContent = data.fact;
+    if (whyWeirdEl) whyWeirdEl.textContent = data.why_weird || "";
     document.title = isTodayFact ? "huh. · fact of the day" : "huh. · random fact";
     if (data.source_url && isSafeUrl(data.source_url)) {
       sourceEl.href = data.source_url;
@@ -206,6 +208,7 @@
     factEl.classList.remove("skeleton");
     factEl.textContent = "couldn't load a fact — tap or press space to retry.";
     sourceEl.style.visibility = "hidden";
+    if (whyWeirdEl) whyWeirdEl.textContent = "";
     current = null;
   }
 
@@ -248,8 +251,21 @@
     }
   }
 
+  function topSavedDomains(limit) {
+    const counts = {};
+    for (const item of getSaved()) {
+      if (!item.domain) continue;
+      counts[item.domain] = (counts[item.domain] || 0) + 1;
+    }
+    return Object.keys(counts)
+      .sort((a, b) => counts[b] - counts[a])
+      .slice(0, limit);
+  }
+
   function next() {
-    load("/api/random");
+    const avoid = topSavedDomains(3);
+    const url = avoid.length ? `/api/random?avoid=${encodeURIComponent(avoid.join(","))}` : "/api/random";
+    load(url);
   }
 
   function dismissHint() {

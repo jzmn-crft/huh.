@@ -22,7 +22,13 @@ if (!Array.isArray(facts) || facts.length === 0) {
 
 const entries = facts.map((f, i) => {
   const key = `fact:${String(i + 1).padStart(4, "0")}`;
-  const value = JSON.stringify({ fact: f.fact, source_url: f.source_url });
+  const value = JSON.stringify({
+    fact: f.fact,
+    source_url: f.source_url,
+    domain: f.domain,
+    why_weird: f.why_weird,
+    lane: f.lane,
+  });
   return { key, value };
 });
 

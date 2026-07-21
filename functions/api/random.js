@@ -1,13 +1,24 @@
 import { getFactCount, getFactByIndex } from "./_facts.js";
 
-export async function onRequestGet({ env }) {
+const MAX_ATTEMPTS = 8;
+
+export async function onRequestGet({ env, request }) {
   const count = await getFactCount(env);
   if (count === 0) {
     return jsonError("No facts available");
   }
 
-  const index = Math.floor(Math.random() * count);
-  const fact = await getFactByIndex(env, index);
+  const url = new URL(request.url);
+  const avoid = (url.searchParams.get("avoid") || "")
+    .split(",")
+    .map((d) => d.trim())
+    .filter(Boolean);
+
+  let fact = await getFactByIndex(env, Math.floor(Math.random() * count));
+  for (let attempt = 1; avoid.includes(fact.domain) && attempt < MAX_ATTEMPTS; attempt++) {
+    fact = await getFactByIndex(env, Math.floor(Math.random() * count));
+  }
+
   const date = new Date().toISOString().slice(0, 10);
 
   return json({ date, ...fact });

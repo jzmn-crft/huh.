@@ -2,26 +2,37 @@
   {
     "id": 1,
     "fact": "This is placeholder sample content for local development only — the real, curated facts live in Cloudflare KV and are never committed to this repo.",
-    "source_url": "https://example.com/sample-one"
+    "source_url": "https://example.com/sample-one",
+    "domain": "meta",
+    "lane": "standard"
   },
   {
     "id": 2,
     "fact": "Sample fact #2: swap facts.sample.json for a live KV binding in production; this file exists purely so the site runs and looks right without credentials.",
-    "source_url": "https://example.com/sample-two"
+    "source_url": "https://example.com/sample-two",
+    "domain": "engineering",
+    "lane": "standard"
   },
   {
     "id": 3,
-    "fact": "Sample fact #3: each real record in KV follows the same { fact, source_url } shape as these placeholders.",
-    "source_url": "https://example.com/sample-three"
+    "fact": "Sample fact #3: each real record in KV follows the same { fact, source_url, domain, why_weird, lane } shape as these placeholders.",
+    "source_url": "https://example.com/sample-three",
+    "domain": "meta",
+    "why_weird": "the schema describing itself is its own example",
+    "lane": "hidden-connection"
   },
   {
     "id": 4,
     "fact": "Sample fact #4: today's fact and the 'another' button both pull one record at a time — never the full list.",
-    "source_url": "https://example.com/sample-four"
+    "source_url": "https://example.com/sample-four",
+    "domain": "engineering",
+    "lane": "standard"
   },
   {
     "id": 5,
     "fact": "Sample fact #5: see README.md for how to load real facts into KV with wrangler kv key put.",
-    "source_url": "https://example.com/sample-five"
+    "source_url": "https://example.com/sample-five",
+    "domain": "meta",
+    "lane": "standard"
   }
 ]

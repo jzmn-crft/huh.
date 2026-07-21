@@ -1,4 +1,3 @@
-# Debug run to diagnose 401 — remove echo/status lines once confirmed working
 name: Supabase Keepalive
 
 on:
@@ -12,9 +11,7 @@ jobs:
     steps:
       - name: Query cases table
         run: |
-          echo "URL: ${SUPABASE_URL}"
-          echo "Key length: ${#SUPABASE_ANON_KEY}"
-          curl -sS -w "\nHTTP_STATUS:%{http_code}\n" \
+          curl --fail -sS \
             "${SUPABASE_URL}/rest/v1/cases?select=id&limit=1" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
