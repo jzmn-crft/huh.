@@ -1,0 +1,22 @@
+name: Supabase Keepalive
+
+on:
+  schedule:
+    - cron: "0 9 */3 * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query cases table
+        run: |
+          echo "URL: ${SUPABASE_URL}"
+          echo "Key length: ${#SUPABASE_ANON_KEY}"
+          curl -sS -w "\nHTTP_STATUS:%{http_code}\n" \
+            "${SUPABASE_URL}/rest/v1/cases?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
