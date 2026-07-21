@@ -1,3 +1,4 @@
+# Debug run to diagnose 401 — remove echo/status lines once confirmed working
 name: Supabase Keepalive
 
 on:
