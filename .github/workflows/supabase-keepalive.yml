@@ -9,10 +9,10 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Query cases table
+      - name: Query keepalive table
         run: |
           curl --fail -sS \
-            "${SUPABASE_URL}/rest/v1/cases?select=id&limit=1" \
+            "${SUPABASE_URL}/rest/v1/_keepalive?select=id&limit=1" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
         env:
