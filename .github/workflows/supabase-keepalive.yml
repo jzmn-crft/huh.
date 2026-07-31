@@ -2,19 +2,29 @@ name: Supabase Keepalive
 
 on:
   schedule:
-    - cron: "0 9 */3 * *"
+    - cron: "0 9 * * *"
   workflow_dispatch: {}
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Query keepalive table
+      - name: Write and delete keepalive row
         run: |
-          curl --fail -sS \
-            "${SUPABASE_URL}/rest/v1/_keepalive?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_ANON_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}"
+          set -e
+
+          ROW_ID=$(curl --fail -sS -X POST \
+            "${SUPABASE_URL}/rest/v1/_keepalive" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d '{}' | jq -r '.[0].id')
+
+          curl --fail -sS -X DELETE \
+            "${SUPABASE_URL}/rest/v1/_keepalive?id=eq.${ROW_ID}" \
+            -H "apikey: ${SUPABASE_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_KEY}"
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
